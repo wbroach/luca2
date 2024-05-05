@@ -43,7 +43,23 @@ public class Parser {
 	}
 
 	private Expr primary() {
-
+		if (match(FALSE)) {
+			return new Expr.Literal(false);
+		}
+		else if (match(TRUE)) {
+			return new Expr.Literal(true);
+		}
+		else if (match(NIL)) {
+			return new Expr.Literal(null);
+		}
+		else if (match(List.of(NUMBER, STRING))) {
+			return new Expr.Literal(previous().literal);
+		}
+		else if (match(LEFT_PAREN)) {
+			Expr expr = expression();
+			consume(RIGHT_PAREN, "Expect ')' after expression.");
+			return new Expr.Grouping(expr);
+		}
 	}
 
 	private Expr parseBinOp(Supplier<Expr> exprType, List<TokenType> opTypes) {
@@ -55,6 +71,10 @@ public class Parser {
 		}
 
 		return expr;
+	}
+
+	private boolean match(TokenType type) {
+		return match(List.of(type));
 	}
 
 	private boolean match(List<TokenType> types) {
