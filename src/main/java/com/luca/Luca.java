@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
+import static com.luca.TokenType.EOF;
+
 public class Luca {
   static boolean hadError = false;
 
@@ -58,8 +60,18 @@ public class Luca {
     report(line, "", message);
   }
 
+  static void error(Token token, String message)  {
+    if (token.type == EOF) {
+      report(token.line, " at end", message);
+    }
+    else {
+      report(token.line, " at '" + token.lexeme + "'", message);
+    }
+  }
+
   private static void report(int line, String where, String message) {
     System.err.println("[line " + line + "] Error" + where + ": " + message);
     hadError = true;
   }
+
 }

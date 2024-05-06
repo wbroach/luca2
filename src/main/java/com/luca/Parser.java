@@ -9,6 +9,8 @@ import static com.luca.TokenType.*;
 
 @RequiredArgsConstructor
 public class Parser {
+	private static class ParseError extends RuntimeException {}
+
 	private final List<Token> tokens;
 	private int current = 0;
 
@@ -46,16 +48,20 @@ public class Parser {
 		if (match(FALSE)) {
 			return new Expr.Literal(false);
 		}
-		else if (match(TRUE)) {
+
+		if (match(TRUE)) {
 			return new Expr.Literal(true);
 		}
-		else if (match(NIL)) {
+
+		if (match(NIL)) {
 			return new Expr.Literal(null);
 		}
-		else if (match(List.of(NUMBER, STRING))) {
+
+		if (match(List.of(NUMBER, STRING))) {
 			return new Expr.Literal(previous().literal);
 		}
-		else if (match(LEFT_PAREN)) {
+
+		if (match(LEFT_PAREN)) {
 			Expr expr = expression();
 			consume(RIGHT_PAREN, "Expect ')' after expression.");
 			return new Expr.Grouping(expr);
@@ -107,6 +113,20 @@ public class Parser {
 
 	private Token peek() {
 		return tokens.get(current);
+	}
+
+	private Token consume(TokenType type, String message) {
+		if (check(type)) {
+			return advance();
+		}
+		else {
+			throw error(peek(), message);
+		}
+	}
+
+	private ParseError error(Token token, String message) {
+		Luca.error(token, message);
+		return new ParseError();
 	}
 
 	private boolean isAtEnd() {
