@@ -14,6 +14,14 @@ public class Parser {
 	private final List<Token> tokens;
 	private int current = 0;
 
+	Expr parse() {
+		try {
+			return expression();
+		} catch (ParseError error) {
+			return null;
+		}
+	}
+
 	private Expr expression() {
 		return equality();
 	}
@@ -48,23 +56,22 @@ public class Parser {
 		if (match(FALSE)) {
 			return new Expr.Literal(false);
 		}
-
-		if (match(TRUE)) {
+		else if (match(TRUE)) {
 			return new Expr.Literal(true);
 		}
-
-		if (match(NIL)) {
+		else if (match(NIL)) {
 			return new Expr.Literal(null);
 		}
-
-		if (match(List.of(NUMBER, STRING))) {
+		else if (match(List.of(NUMBER, STRING))) {
 			return new Expr.Literal(previous().literal);
 		}
-
-		if (match(LEFT_PAREN)) {
+		else if (match(LEFT_PAREN)) {
 			Expr expr = expression();
 			consume(RIGHT_PAREN, "Expect ')' after expression.");
 			return new Expr.Grouping(expr);
+		}
+		else {
+			throw error(peek(), "Expect expression.");
 		}
 	}
 
@@ -127,6 +134,23 @@ public class Parser {
 	private ParseError error(Token token, String message) {
 		Luca.error(token, message);
 		return new ParseError();
+	}
+
+	private void synchronize() {
+		advance();
+		while (isNotAtEnd()) {
+			if (previous().type == SEMICOLON) { return; }
+
+			if (checkKeyword(peek().type)) { return; }
+
+			advance();
+		}
+	}
+
+	private boolean checkKeyword(TokenType type) {
+		return type == CLASS || type == FOR || type == FUNC
+						|| type == IF || type == PRINT || type == RETURN
+						|| type == VAR || type == WHILE;
 	}
 
 	private boolean isAtEnd() {
