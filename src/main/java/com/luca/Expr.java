@@ -60,5 +60,4 @@ abstract class Expr {
 			return visitor.visitUnaryExpr(this);
 		}
 	}
-
 }

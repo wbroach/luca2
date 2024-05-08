@@ -73,5 +73,4 @@ public class Luca {
     System.err.println("[line " + line + "] Error" + where + ": " + message);
     hadError = true;
   }
-
 }
