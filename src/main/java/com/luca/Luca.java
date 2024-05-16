@@ -13,6 +13,8 @@ import static com.luca.TokenType.EOF;
 
 public class Luca {
   static boolean hadError = false;
+  static boolean hadRuntimeError = false;
+  private static final Interpreter interpreter = new Interpreter();
 
   public static void main(String[] args) throws IOException {
   if (args.length > 1) {
@@ -34,6 +36,8 @@ public class Luca {
     Expr expression = parser.parse();
 
     if (hadError) { return; }
+
+    interpreter.interpret(expression);
   }
 
   private static void runFile(String path) throws IOException {
@@ -41,6 +45,7 @@ public class Luca {
     run(new String(bytes, Charset.defaultCharset()));
 
     if (hadError) { System.exit(65); }
+    if (hadRuntimeError) { System.exit(70); }
   }
 
   private static void runPrompt() throws IOException {
@@ -67,6 +72,11 @@ public class Luca {
     else {
       report(token.line, " at '" + token.lexeme + "'", message);
     }
+  }
+
+  static void runtimeError(RuntimeError error) {
+    System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+    hadRuntimeError = true;
   }
 
   private static void report(int line, String where, String message) {

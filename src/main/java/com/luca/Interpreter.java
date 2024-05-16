@@ -1,8 +1,19 @@
 package com.luca;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Objects;
 
 public class Interpreter implements Expr.Visitor<Object> {
+
+	void interpret(Expr expr) {
+		try {
+			Object value = evaluate(expr);
+			System.out.println(stringify(value));
+		} catch (RuntimeError error) {
+			Lox.runtimeError(error);
+		}
+	}
 
 	@Override
 	public Object visitBinaryExpr(Expr.Binary expr) {
@@ -11,27 +22,35 @@ public class Interpreter implements Expr.Visitor<Object> {
 
 		switch (expr.operator.type) {
 			case GREATER:
+				checkNumberOperand(expr.operator, left, right);
 				return (double)left > (double)right;
 			case GREATER_EQUAL:
+				checkNumberOperand(expr.operator, left, right);
 				return (double)left >= (double)right;
 			case LESS:
+				checkNumberOperand(expr.operator, left, right);
 				return (double)left < (double)right;
 			case LESS_EQUAL:
+				checkNumberOperand(expr.operator, left, right);
 				return (double)left <= (double)right;
 			case MINUS:
+				checkNumberOperand(expr.operator, left, right);
 				return (double)left - (double)right;
 			case PLUS:
 				if (additionEligible(left, right)) {
 					return (double)left + (double)right;
 				}
-				else if(concatEligible(left, right)) {
+				else if (concatEligible(left, right)) {
 					return (String)left + (String)right;
 				}
-
-				break;
+				else {
+					throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
+				}
 			case SLASH:
+				checkNumberOperand(expr.operator, left, right);
 				return (double)left / (double)right;
 			case STAR:
+				checkNumberOperand(expr.operator, left, right);
 				return (double)left * (double)right;
 			case BANG_EQUAL:
 				return !isEqual(left, right);
@@ -60,6 +79,7 @@ public class Interpreter implements Expr.Visitor<Object> {
 			case BANG:
 				return !isTruthy(right);
 			case MINUS:
+				checkNumberOperand(expr.operator, right);
 				return -(double)right;
 		}
 
@@ -68,6 +88,18 @@ public class Interpreter implements Expr.Visitor<Object> {
 
 	private Object evaluate(Expr expr) {
 		return expr.accept(this);
+	}
+
+	private void checkNumberOperand(Token operator, Object operand) {
+		if (!(operand instanceof Double)) {
+			throw new RuntimeError(operator, "Operand must be a number.");
+		}
+	}
+
+	private void checkNumberOperand(Token operator, Object left, Object right) {
+		if (!(left instanceof Double && right instanceof Double)) {
+			throw new RuntimeError(operator, "Operands must be numbers");
+		}
 	}
 
 	private boolean isTruthy(Object object) {
@@ -101,4 +133,17 @@ public class Interpreter implements Expr.Visitor<Object> {
 	private boolean concatEligible(Object left, Object right) {
 		return left instanceof String && right instanceof String;
 	}
+
+	private String stringify(Object value) {
+		if (Objects.isNull(value)) {
+			return "nil";
+		}
+		else if (value instanceof Double) {
+			return StringUtils.removeEnd(value.toString(), ".0");
+		}
+		else {
+			return value.toString();
+		}
+	}
+
 }
