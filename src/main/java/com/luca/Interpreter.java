@@ -11,7 +11,7 @@ public class Interpreter implements Expr.Visitor<Object> {
 			Object value = evaluate(expr);
 			System.out.println(stringify(value));
 		} catch (RuntimeError error) {
-			Lox.runtimeError(error);
+			Luca.runtimeError(error);
 		}
 	}
 
@@ -63,7 +63,7 @@ public class Interpreter implements Expr.Visitor<Object> {
 
 	@Override
 	public Object visitGroupingExpr(Expr.Grouping expr) {
-		return this.evaluate(expr);
+		return this.evaluate(expr.expression);
 	}
 
 	@Override
