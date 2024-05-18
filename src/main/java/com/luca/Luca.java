@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import static com.luca.TokenType.EOF;
 
@@ -34,11 +33,11 @@ public class Luca {
     Scanner scanner = new Scanner(source);
     List<Token> tokens = scanner.scanTokens();
     Parser parser = new Parser(tokens);
-    Expr expression = parser.parse();
+    List<Stmt> statements = parser.parse();
 
     if (hadError) { return; }
 
-    interpreter.interpret(expression);
+    interpreter.interpret(statements);
   }
 
   private static void runFile(String path) throws IOException {

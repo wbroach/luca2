@@ -2,17 +2,32 @@ package com.luca;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.Objects;
 
-public class Interpreter implements Expr.Visitor<Object> {
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
-	void interpret(Expr expr) {
+	void interpret(List<Stmt> statements) {
 		try {
-			Object value = evaluate(expr);
-			System.out.println(stringify(value));
+			for (Stmt statement : statements) {
+				execute(statement);
+			}
 		} catch (RuntimeError error) {
 			Luca.runtimeError(error);
 		}
+	}
+
+	@Override
+	public Void visitExpressionStmt(Stmt.Expression stmt) {
+		evaluate(stmt.expression);
+		return null;
+	}
+
+	@Override
+	public Void visitPrintStmt(Stmt.Print stmt) {
+		Object value = evaluate(stmt.expression);
+		System.out.println(stringify(value));
+		return null;
 	}
 
 	@Override
@@ -86,6 +101,10 @@ public class Interpreter implements Expr.Visitor<Object> {
 		return null; // unreachable
 	}
 
+	private void execute(Stmt stmt) {
+		stmt.accept(this);
+	}
+
 	private Object evaluate(Expr expr) {
 		return expr.accept(this);
 	}
@@ -145,5 +164,4 @@ public class Interpreter implements Expr.Visitor<Object> {
 			return value.toString();
 		}
 	}
-
 }

@@ -1,10 +1,8 @@
 package com.luca;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-@Builder
 @RequiredArgsConstructor
 class Token {
   final TokenType type;
