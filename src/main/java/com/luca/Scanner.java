@@ -168,12 +168,7 @@ class Scanner {
 
   private void addToken(TokenType tokenType, Object literal) {
     String text = source.substring(start, current);
-    tokens.add(Token.builder()
-      .type(tokenType)
-      .lexeme(text)
-      .literal(literal)
-      .line(this.line)
-      .build());
+    tokens.add(new Token(tokenType, text, literal, line));
   }
 
   private boolean isDigit(char c) {

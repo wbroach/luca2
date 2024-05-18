@@ -1,6 +1,5 @@
 package com.luca;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
 abstract class Expr {
@@ -14,7 +13,6 @@ abstract class Expr {
 
 	abstract <R> R accept(Visitor<R> visitor);
 
-	@Builder
 	@RequiredArgsConstructor
 	static class Binary extends Expr {
 		final Expr left;
@@ -27,7 +25,6 @@ abstract class Expr {
 		}
 	}
 
-	@Builder
 	@RequiredArgsConstructor
 	static class Grouping extends Expr {
 		final Expr expression;
@@ -38,7 +35,6 @@ abstract class Expr {
 		}
 	}
 
-	@Builder
 	@RequiredArgsConstructor
 	static class Literal extends Expr {
 		final Object value;
@@ -49,7 +45,6 @@ abstract class Expr {
 		}
 	}
 
-	@Builder
 	@RequiredArgsConstructor
 	static class Unary extends Expr {
 		final Token operator;
