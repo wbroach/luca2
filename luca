@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Generalized script location
+script_loc=$(dirname "$0")
+# name of jar file must be changed if changed in pom
+java -jar ${script_loc}/target/luca-1.0-SNAPSHOT.jar $@
