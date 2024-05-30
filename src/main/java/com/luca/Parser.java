@@ -106,6 +106,17 @@ public class Parser {
 		return parseBinOp(this::unary, List.of(STAR, SLASH));
 	}
 
+	private Expr parseBinOp(Supplier<Expr> exprType, List<TokenType> opTypes) {
+		Expr expr = exprType.get();
+		while(match(opTypes)) {
+			Token operator = previous();
+			Expr right = exprType.get();
+			expr = new Expr.Binary(expr, operator, right);
+		}
+
+		return expr;
+	}
+
 	private Expr unary() {
 		if (match(List.of(BANG, MINUS))) {
 			Token operator = previous();
@@ -140,17 +151,6 @@ public class Parser {
 		else {
 			throw error(peek(), "Expect expression.");
 		}
-	}
-
-	private Expr parseBinOp(Supplier<Expr> exprType, List<TokenType> opTypes) {
-		Expr expr = exprType.get();
-		while(match(opTypes)) {
-			Token operator = previous();
-			Expr right = exprType.get();
-			expr = new Expr.Binary(expr, operator, right);
-		}
-
-		return expr;
 	}
 
 	private boolean match(TokenType type) {
