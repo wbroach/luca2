@@ -49,7 +49,10 @@ public class Parser {
 	}
 
 	private Stmt statement() {
-		if (match(PRINT)) {
+		if (match(IF)) {
+			return ifStatement();
+		}
+		else if (match(PRINT)) {
 			return printStatement();
 		}
 		else if (match(LEFT_BRACE)) {
@@ -57,6 +60,10 @@ public class Parser {
 		}
 
 		return expressionStatement();
+	}
+
+	private Stmt ifStatement() {
+		return null;
 	}
 
 	private Stmt printStatement() {
