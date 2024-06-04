@@ -146,7 +146,7 @@ public class Parser {
 	}
 
 	private Expr term() {
-		return parseBinOp(this::factor, List.of(MINUS, PLUS));
+		return parseBinOp(this::factor, List.of(PLUS, MINUS));
 	}
 
 	private Expr factor() {
