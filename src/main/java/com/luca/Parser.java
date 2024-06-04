@@ -63,7 +63,14 @@ public class Parser {
 	}
 
 	private Stmt ifStatement() {
-		return null;
+		consume(LEFT_PAREN, "Expect '(' after 'if'.");
+		Expr condition = expression();
+		consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+		Stmt thenBranch = statement();
+		Stmt elseBranch = match(ELSE) ? statement() : null;
+
+		return new Stmt.If(condition, thenBranch, elseBranch);
 	}
 
 	private Stmt printStatement() {
@@ -94,7 +101,7 @@ public class Parser {
 	}
 
 	private Expr assignment() {
-		Expr expr = equality();
+		Expr expr = or();
 
 		if (match(EQUAL)) {
 			Token equals = previous();
@@ -106,6 +113,25 @@ public class Parser {
 			}
 
 			error(equals, "Invalid assignment target.");
+		}
+
+		return expr;
+	}
+
+	private Expr or() {
+		return parseLogicalOp(this::and, OR);
+	}
+
+	private Expr and() {
+		return parseLogicalOp(this::equality, AND);
+	}
+
+	private Expr parseLogicalOp(Supplier<Expr> exprType, TokenType opType) {
+		Expr expr = exprType.get();
+		while(match(opType)) {
+			Token operator = previous();
+			Expr right = exprType.get();
+			expr = new Expr.Logical(expr, operator, right);
 		}
 
 		return expr;
