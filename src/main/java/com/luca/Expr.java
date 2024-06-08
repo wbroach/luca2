@@ -2,11 +2,14 @@ package com.luca;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 abstract class Expr {
 
 	interface Visitor<R> {
 		R visitAssignExpr(Assign expr);
 		R visitBinaryExpr(Binary expr);
+		R visitCallExpr(Call expr);
 		R visitGroupingExpr(Grouping expr);
 		R visitLiteralExpr(Literal expr);
 		R visitLogicalExpr(Logical expr);
@@ -36,6 +39,18 @@ abstract class Expr {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitBinaryExpr(this);
+		}
+	}
+
+	@RequiredArgsConstructor
+	static class Call extends Expr {
+		final Expr callee;
+		final Token paren;
+		final List<Expr> arguments;
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitCallExpr(this);
 		}
 	}
 
