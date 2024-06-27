@@ -28,12 +28,19 @@ public class Parser {
 			if (match(VAR)) {
 				return varDeclaration();
 			}
+			else if (match(FUNC)) {
+				return function("function");
+			}
 
 			return statement();
 		} catch (ParseError e) {
 			synchronize();
 			return null;
 		}
+	}
+
+	private Stmt.Function function(String kind) {
+		Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
 	}
 
 	private Stmt varDeclaration() {
