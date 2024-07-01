@@ -11,7 +11,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	private Environment environment = globals;
 
 	Interpreter() {
-		globals.define("clock", new LoxCallable() {
+		globals.define("clock", new LucaCallable() {
 			@Override
 			public int arity() {
 				return 0;
@@ -47,6 +47,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		}
 
 		environment.define(stmt.name.lexeme, value);
+		return null;
+	}
+
+	@Override
+	public Void visitFunctionStmt(Stmt.Function stmt) {
+		LucaFunction function = new LucaFunction(stmt);
+		environment.define(stmt.name.lexeme, function);
 		return null;
 	}
 
@@ -162,10 +169,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			arguments.add(evaluate(argument));
 		}
 
-		if (!(callee instanceof LoxCallable)) {
+		if (!(callee instanceof LucaCallable)) {
 			throw new RuntimeError(expr.paren, "Can only call functions and classes.");
 		}
-		LoxCallable function = (LoxCallable) callee;
+		LucaCallable function = (LucaCallable) callee;
 
 		if (arguments.size() != function.arity()) {
 			throw new RuntimeError(expr.paren, "Expected " + function.arity() + " arguments but got "

@@ -10,6 +10,7 @@ import static com.luca.TokenType.*;
 
 @RequiredArgsConstructor
 public class Parser {
+	private static final int MAX_PARAMS_ARGS = 255;
 	private static class ParseError extends RuntimeException {}
 
 	private final List<Token> tokens;
@@ -41,6 +42,20 @@ public class Parser {
 
 	private Stmt.Function function(String kind) {
 		Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+		consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+		List<Token> parameters = new ArrayList<>();
+		if (!check(RIGHT_PAREN)) {
+			do {
+				if (parameters.size() >= MAX_PARAMS_ARGS) {
+					error(peek(), "Can't have more than " + MAX_PARAMS_ARGS + " parameters.");
+				}
+				parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+			} while (match(COMMA));
+		}
+		consume(RIGHT_PAREN, "Expect ')' after parameters.");
+		consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+		List<Stmt> body = block();
+		return new Stmt.Function(name, parameters, body);
 	}
 
 	private Stmt varDeclaration() {
@@ -261,8 +276,8 @@ public class Parser {
 		List<Expr> arguments = new ArrayList<>();
 		if (!check(RIGHT_PAREN)) {
 			do {
-				if (arguments.size() > 255) {
-					error(peek(), "Can't have more than 255 arguments");
+				if (arguments.size() >= MAX_PARAMS_ARGS) {
+					error(peek(), "Can't have more than " + MAX_PARAMS_ARGS + " arguments");
 				}
 				arguments.add(expression());
 			} while (match(COMMA));
