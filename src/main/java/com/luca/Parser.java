@@ -26,12 +26,8 @@ public class Parser {
 
 	private Stmt declaration() {
 		try {
-			if (match(VAR)) {
-				return varDeclaration();
-			}
-			else if (match(FUNC)) {
-				return function("function");
-			}
+			if (match(VAR)) { return varDeclaration(); }
+			if (match(FUNC)) { return function("function"); }
 
 			return statement();
 		} catch (ParseError e) {

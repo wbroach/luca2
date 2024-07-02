@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	final Environment globals = new Environment();
@@ -246,7 +245,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	}
 
 	private boolean isTruthy(Object object) {
-		if (Objects.isNull(object)) {
+		if (object == null) {
 			return false;
 		}
 		else if (object instanceof Boolean) {
@@ -258,10 +257,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	}
 
 	private boolean isEqual(Object left, Object right) {
-		if (Objects.isNull(left) && Objects.isNull(right)) {
+		if (left == null && right == null) {
 			return true;
 		}
-		else if (Objects.isNull(left)) {
+		else if (left == null) {
 			return false;
 		}
 		else {
@@ -278,7 +277,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	}
 
 	private String stringify(Object value) {
-		if (Objects.isNull(value)) {
+		if (value == null) {
 			return "nil";
 		}
 		else if (value instanceof Double) {
