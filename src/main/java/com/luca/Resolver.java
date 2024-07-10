@@ -136,7 +136,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		return null;
 	}
 
-	private void resolve(List<Stmt> statements) {
+	void resolve(List<Stmt> statements) {
 		for (Stmt statement : statements) {
 			resolve(statement);
 		}
@@ -162,6 +162,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		if (scopes.isEmpty()) { return; }
 
 		Map<String, Boolean> scope = scopes.peek();
+		if (scope.containsKey(name.lexeme)) {
+			Luca.error(name, "Already a variable with this name in this scope.");
+		}
 		scope.put(name.lexeme, false);
 	}
 
