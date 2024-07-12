@@ -6,8 +6,14 @@ import java.util.*;
 
 @RequiredArgsConstructor
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
+	private enum FunctionType {
+		NONE,
+		FUNCTION
+	}
+
 	private final Interpreter interpreter;
 	private final Stack<HashMap<String, Boolean>> scopes = new Stack<>();
+	private FunctionType currentFunction = FunctionType.NONE;
 
 	@Override
 	public Void visitBlockStmt(Stmt.Block stmt) {
@@ -27,11 +33,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	public Void visitFunctionStmt(Stmt.Function stmt) {
 		declare(stmt.name);
 		define(stmt.name);
-		resolveFunction(stmt);
+		resolveFunction(stmt, FunctionType.FUNCTION);
 		return null;
 	}
 
-	private void resolveFunction(Stmt.Function function) {
+	private void resolveFunction(Stmt.Function function, FunctionType type) {
+		Resolver.FunctionType enclosingFunction = currentFunction;
+		currentFunction = type;
+
 		beginScope();
 		for (Token param : function.params) {
 			declare(param);
@@ -39,6 +48,8 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		}
 		resolve(function.body);
 		endScope();
+
+		currentFunction = enclosingFunction;
 	}
 
 	@Override
@@ -58,6 +69,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
 	@Override
 	public Void visitReturnStmt(Stmt.Return stmt) {
+		if (currentFunction == FunctionType.NONE) {
+			Luca.error(stmt.keyword, "Can't return from top level code.");
+		}
+
 		if (stmt.value != null) { resolve(stmt.value); }
 		return null;
 	}
