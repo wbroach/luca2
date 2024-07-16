@@ -212,6 +212,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	}
 
 	@Override
+	public Object visitGetExpr(Expr.Get expr) {
+		Object object = evaluate(expr);
+		if (object instanceof LucaInstance) {
+			return ((LucaInstance) object).get(expr.name);
+		}
+
+		throw new RuntimeError(expr.name, "Only instances have properties.");
+	}
+
+	@Override
 	public Object visitGroupingExpr(Expr.Grouping expr) {
 		return evaluate(expr.expression);
 	}
