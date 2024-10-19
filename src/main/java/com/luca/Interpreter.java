@@ -54,7 +54,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	}
 
 	@Override
-
 	public Void visitFunctionStmt(Stmt.Function stmt) {
 		LucaFunction function = new LucaFunction(stmt, environment);
 		environment.define(stmt.name.lexeme, function);

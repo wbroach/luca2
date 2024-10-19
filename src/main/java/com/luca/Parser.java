@@ -236,7 +236,7 @@ public class Parser {
 
 	private Expr parseLogicalOp(Supplier<Expr> exprType, TokenType opType) {
 		Expr expr = exprType.get();
-		while(match(opType)) {
+		while (match(opType)) {
 			Token operator = previous();
 			Expr right = exprType.get();
 			expr = new Expr.Logical(expr, operator, right);
@@ -263,7 +263,7 @@ public class Parser {
 
 	private Expr parseBinOp(Supplier<Expr> exprType, List<TokenType> opTypes) {
 		Expr expr = exprType.get();
-		while(match(opTypes)) {
+		while (match(opTypes)) {
 			Token operator = previous();
 			Expr right = exprType.get();
 			expr = new Expr.Binary(expr, operator, right);
