@@ -2,13 +2,18 @@ package com.luca;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 
 @RequiredArgsConstructor
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	private enum FunctionType {
 		NONE,
-		FUNCTION
+		FUNCTION,
+		METHOD
 	}
 
 	private final Interpreter interpreter;
@@ -27,6 +32,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	public Void visitClassStmt(Stmt.Class stmt) {
 		declare(stmt.name);
 		define(stmt.name);
+
+		for (Stmt.Function method : stmt.methods) {
+			FunctionType declaration = FunctionType.METHOD;
+			resolveFunction(method, declaration);
+		}
+
 		return null;
 	}
 
@@ -145,6 +156,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	@Override
 	public Void visitLogicalExpr(Expr.Logical expr) {
 		resolve(expr.left); resolve(expr.right);
+		return null;
+	}
+
+	@Override
+	public Void visitSetExpr(Expr.Set expr) {
+		resolve(expr.object);
+		resolve(expr.value);
 		return null;
 	}
 

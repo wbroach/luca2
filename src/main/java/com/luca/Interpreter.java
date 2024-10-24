@@ -2,7 +2,12 @@ package com.luca;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	final Environment globals = new Environment();
@@ -242,6 +247,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		}
 
 		return evaluate(expr.right);
+	}
+
+	@Override
+	public Object visitSetExpr(Expr.Set expr) {
+		Object object = evaluate(expr.object);
+
+		if (!(object instanceof LucaInstance)) {
+			throw new RuntimeError(expr.name, "Only instances have fields.");
+		}
+
+		Object value = evaluate(expr.value);
+		((LucaInstance) object).set(expr.name, value);
+		return value;
 	}
 
 	@Override
