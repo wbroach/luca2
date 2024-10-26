@@ -122,7 +122,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	@Override
 	public Void visitClassStmt(Stmt.Class stmt) {
 		environment.define(stmt.name.lexeme, null);
-		LucaClass klass = new LucaClass(stmt.name.lexeme);
+
+		Map<String, LucaFunction> methods = new HashMap<>();
+		for (Stmt.Function method : stmt.methods) {
+			LucaFunction function = new LucaFunction(method, environment);
+			methods.put(method.name.lexeme, function);
+		}
+
+		LucaClass klass = new LucaClass(stmt.name.lexeme, methods);
 		environment.assign(stmt.name, klass);
 		return null;
 	}
