@@ -1,15 +1,14 @@
 package com.luca;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@RequiredArgsConstructor
 class LucaInstance {
-	private LucaClass klass;
+	private final LucaClass klass;
 	private final Map<String, Object> fields = new HashMap<>();
-
-	LucaInstance(LucaClass klass) {
-		this.klass = klass;
-	}
 
 	Object get(Token name) {
 		if (fields.containsKey(name.lexeme)) {
